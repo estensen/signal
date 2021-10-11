@@ -31,7 +31,7 @@ func NewRoomManager() *RoomManager {
 
 func (r *RoomManager) getRoom(id string) *Room {
 	r.mutex.RLock()
-	defer r.mutex.Unlock()
+	defer r.mutex.RUnlock()
 
 	return r.rooms[id]
 }
