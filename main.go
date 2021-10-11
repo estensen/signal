@@ -6,8 +6,9 @@ import (
 )
 
 func main() {
+	roomManager := NewRoomManager()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		WebSocketHandler(w, r)
+		roomManager.WebSocketHandler(w, r)
 	})
 	log.Println("server listening on :8000")
 	http.ListenAndServe(":8000", nil)

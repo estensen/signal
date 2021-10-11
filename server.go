@@ -18,7 +18,7 @@ type WSMessage struct {
 	Data string `json:"data"`
 }
 
-func WebSocketHandler(w http.ResponseWriter, req *http.Request) {
+func (roomManager *RoomManager) WebSocketHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Println(err)
