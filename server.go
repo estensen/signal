@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -18,7 +19,7 @@ type WSMessage struct {
 	Data string `json:"data"`
 }
 
-func (roomManager *RoomManager) WebSocketHandler(w http.ResponseWriter, req *http.Request) {
+func (r *RoomManager) WebSocketHandler(w http.ResponseWriter, req *http.Request) {
 	conn, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Println(err)
@@ -35,4 +36,14 @@ func (roomManager *RoomManager) WebSocketHandler(w http.ResponseWriter, req *htt
 
 		log.Println(msg)
 	}
+}
+
+func (r *RoomManager) CreateRoomHandler(w http.ResponseWriter, req *http.Request) {
+	room := r.createRoom()
+
+	type resp struct {
+		RoomID string `json:"room_id"`
+	}
+
+	json.NewEncoder(w).Encode(resp{RoomID: room.ID})
 }

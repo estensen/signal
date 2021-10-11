@@ -36,10 +36,13 @@ func (roomManager *RoomManager) getRoom(id string) *Room {
 	return roomManager.rooms[id]
 }
 
-func (roomManager *RoomManager) createRoom(id string) *Room {
+func (roomManager *RoomManager) createRoom() *Room {
 	roomManager.roomLock.Lock()
 	defer roomManager.roomLock.Unlock()
 
+	id := RandString(6)
+
+	// TODO: Handle generating same ID
 	roomManager.rooms[id] = NewRoom(id)
 	return roomManager.rooms[id]
 }
