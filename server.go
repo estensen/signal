@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -49,6 +51,22 @@ func (r *RoomManager) CreateRoomHandler(w http.ResponseWriter, req *http.Request
 	json.NewEncoder(w).Encode(resp{RoomID: room.ID})
 }
 
+func broadcaster(room *Room, sender string) {
+	for {
+		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+		// Don't yo yourself
+		for _, client := range room.users {
+			if client.info.ID != sender {
+				err := client.conn.WriteJSON(fmt.Sprintf("yo from %s", sender))
+				if err != nil {
+					fmt.Println("could not broadcast", err)
+					client.conn.Close()
+				}
+			}
+		}
+	}
+}
+
 func (r *RoomManager) JoinRoomHandler(w http.ResponseWriter, req *http.Request) {
 	roomID, ok := req.URL.Query()["roomID"]
 	if !ok {
@@ -73,4 +91,20 @@ func (r *RoomManager) JoinRoomHandler(w http.ResponseWriter, req *http.Request) 
 	}
 
 	r.joinRoom(roomID[0], user)
+
+	room := r.getRoom(roomID[0])
+
+	// Sometimes yo other people
+	go broadcaster(room, userID)
+
+	// Listen forever for yo's
+	for {
+		var msg string
+		err := ws.ReadJSON(&msg)
+		if err != nil {
+			fmt.Println("could not listen for yo's :/", err)
+		}
+
+		//fmt.Printf("%s: other machine said: %s", userID, msg)
+	}
 }
