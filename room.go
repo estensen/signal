@@ -25,3 +25,16 @@ func NewRoomManager() *RoomManager {
 	}
 	return roomManager
 }
+
+func (roomManager *RoomManager) getRoom(id string) *Room {
+	return roomManager.rooms[id]
+}
+
+func (roomManager *RoomManager) createRoom(id string) *Room {
+	roomManager.rooms[id] = NewRoom(id)
+	return roomManager.rooms[id]
+}
+
+func (roomManager *RoomManager) deleteRoom(id string) {
+	delete(roomManager.rooms, id)
+}
