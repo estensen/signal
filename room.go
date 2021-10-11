@@ -18,8 +18,8 @@ func NewRoom(id string) *Room {
 }
 
 type RoomManager struct {
-	rooms    map[string]*Room
-	roomLock sync.RWMutex
+	rooms map[string]*Room
+	mutex sync.RWMutex
 }
 
 func NewRoomManager() *RoomManager {
@@ -29,27 +29,34 @@ func NewRoomManager() *RoomManager {
 	return roomManager
 }
 
-func (roomManager *RoomManager) getRoom(id string) *Room {
-	roomManager.roomLock.RLock()
-	defer roomManager.roomLock.Unlock()
+func (r *RoomManager) getRoom(id string) *Room {
+	r.mutex.RLock()
+	defer r.mutex.Unlock()
 
-	return roomManager.rooms[id]
+	return r.rooms[id]
 }
 
-func (roomManager *RoomManager) createRoom() *Room {
-	roomManager.roomLock.Lock()
-	defer roomManager.roomLock.Unlock()
+func (r *RoomManager) createRoom() *Room {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	id := RandString(6)
 
 	// TODO: Handle generating same ID
-	roomManager.rooms[id] = NewRoom(id)
-	return roomManager.rooms[id]
+	r.rooms[id] = NewRoom(id)
+	return r.rooms[id]
 }
 
-func (roomManager *RoomManager) deleteRoom(id string) {
-	roomManager.roomLock.Lock()
-	defer roomManager.roomLock.Unlock()
+func (r *RoomManager) joinRoom(roomID string, user User) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
-	delete(roomManager.rooms, id)
+	r.rooms[roomID].users[user.info.ID] = user
+}
+
+func (r *RoomManager) deleteRoom(id string) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	delete(r.rooms, id)
 }

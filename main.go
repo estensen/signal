@@ -15,6 +15,9 @@ func main() {
 	http.HandleFunc("/create", func(w http.ResponseWriter, r *http.Request) {
 		roomManager.CreateRoomHandler(w, r)
 	})
+	http.HandleFunc("/join", func(w http.ResponseWriter, r *http.Request) {
+		roomManager.JoinRoomHandler(w, r)
+	})
 	log.Println("server listening on :8000")
 	http.ListenAndServe(":8000", nil)
 }
