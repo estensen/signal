@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 type Room struct {
 	users   map[string]User
 	session map[string]Session
@@ -16,7 +18,8 @@ func NewRoom(id string) *Room {
 }
 
 type RoomManager struct {
-	rooms map[string]*Room
+	rooms    map[string]*Room
+	roomLock sync.RWMutex
 }
 
 func NewRoomManager() *RoomManager {
@@ -27,14 +30,23 @@ func NewRoomManager() *RoomManager {
 }
 
 func (roomManager *RoomManager) getRoom(id string) *Room {
+	roomManager.roomLock.RLock()
+	defer roomManager.roomLock.Unlock()
+
 	return roomManager.rooms[id]
 }
 
 func (roomManager *RoomManager) createRoom(id string) *Room {
+	roomManager.roomLock.Lock()
+	defer roomManager.roomLock.Unlock()
+
 	roomManager.rooms[id] = NewRoom(id)
 	return roomManager.rooms[id]
 }
 
 func (roomManager *RoomManager) deleteRoom(id string) {
+	roomManager.roomLock.Lock()
+	defer roomManager.roomLock.Unlock()
+
 	delete(roomManager.rooms, id)
 }
